@@ -23,7 +23,6 @@ public class Pong extends GraphicsProgram {
 		ball.setFilled(true);
 		ball.setColor(Color.decode("#31fa00"));
 		add(ball, getWidth() / 2 - BALL_WIDTH/2, getHeight() / 2 - BALL_WIDTH/2);
+		ball.setFillColor(Color.green);
 	}
-
-	
 }
