@@ -11,18 +11,18 @@ public class Pong extends GraphicsProgram {
 		createBackGround();
 		createBall();
 	}
-	//This creates the background
+
 	public void createBackGround() {
 		setSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
 		setBackground(Color.decode("#8c8786"));
 
 	}
-	//This creates the ball in the middle
+
 	public void createBall() {
 		GOval ball = new GOval(BALL_WIDTH, BALL_WIDTH);
 		ball.setFilled(true);
 		ball.setColor(Color.decode("#31fa00"));
 		add(ball, getWidth() / 2 - BALL_WIDTH/2, getHeight() / 2 - BALL_WIDTH/2);
-		ball.setFillColor(Color.green);
 	}
+	
 }
