@@ -9,7 +9,7 @@ public class Pong extends GraphicsProgram {
 
 	public void run() {
 		createBackGround();
-		createBalll();
+		createBall();
 	}
 	//This creates the background
 	public void createBackGround() {
@@ -18,7 +18,7 @@ public class Pong extends GraphicsProgram {
 
 	}
 	//This creates the ball in the middle
-	public void createBalll() {
+	public void createBall() {
 		GOval ball = new GOval(BALL_WIDTH, BALL_WIDTH);
 		ball.setFilled(true);
 		ball.setColor(Color.decode("#31fa00"));
