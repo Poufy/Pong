@@ -25,7 +25,7 @@ public class Pong extends GraphicsProgram {
 		add(ball, getWidth() / 2 - BALL_WIDTH/2, getHeight() / 2 - BALL_WIDTH/2);
 	}
 	public void lol() {
-		
+		int x = 3;
 	}
 	
 }
