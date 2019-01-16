@@ -24,5 +24,8 @@ public class Pong extends GraphicsProgram {
 		ball.setColor(Color.decode("#31fa00"));
 		add(ball, getWidth() / 2 - BALL_WIDTH/2, getHeight() / 2 - BALL_WIDTH/2);
 	}
+	public void lol() {
+		
+	}
 	
 }
