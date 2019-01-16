@@ -25,4 +25,7 @@ public class Pong extends GraphicsProgram {
 		add(ball, getWidth() / 2 - BALL_WIDTH/2, getHeight() / 2 - BALL_WIDTH/2);
 		ball.setFillColor(Color.green);
 	}
+	public void movingBall() {
+		
+	}
 }
