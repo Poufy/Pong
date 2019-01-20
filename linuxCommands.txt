@@ -1,0 +1,2 @@
+ps aux | grep <process name> to narrow down results
+pkill <process name> or kill <process ID>
