@@ -19,6 +19,12 @@ public class Pong extends GraphicsProgram {
 	GOval ball;
 	GLabel player1;
 	GLabel player2;
+	GRect paddle1;
+	GRect paddle2;
+	GPoint point1;
+	GPoint point2;
+	GPoint point3;
+	GPoint point4;
 	int p1Score = 0;
 	int p2Score = 0;
 
@@ -37,12 +43,12 @@ public class Pong extends GraphicsProgram {
 	}
 
 	public void createBackGround() {
-//		setSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
-		JFrame frame = new JFrame();
-		frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
-		frame.setUndecorated(true);
-		frame.setVisible(true);
-		setBackground(Color.decode("#8c8786"));
+		setSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
+//		JFrame frame = new JFrame();
+//		frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
+//		frame.setUndecorated(true);
+//		frame.setVisible(true);
+		setBackground(Color.decode("#4E4B4B"));
 
 	}
 
@@ -58,20 +64,29 @@ public class Pong extends GraphicsProgram {
 		Random rand = new Random();
 		int dx = rand.nextInt(1) + 3;
 		int dy = rand.nextInt(3) + 5;
-		int i = 0;
-		while (i < 1000) {
+		while (true) {
+			point1 = new GPoint(ball.getX(), ball.getY());
+			point2 = new GPoint(ball.getX() + RADIUS, ball.getY());
+			point3 = new GPoint(ball.getX() - RADIUS /2, ball.getY());
+			point4 = new GPoint(ball.getX() + RADIUS / 2, ball.getY());
 			// <= since we're moving in increments that are higher than 1 so we might skip
 			// the point where ball.getX is equal to getWidth
-			if (getWidth() <= ball.getX() + RADIUS || ball.getX() <= 0) {
+//			paddle1.contains(point3) ||
+//			|| paddle2.contains(point4)
+			if (getWidth() <= ball.getX() + RADIUS || ball.getX() <= 0 || paddle1.contains(point1)
+					||  paddle2.contains(point2) ) {
 				dx = -dx;
 			}
 			if (getHeight() <= ball.getY() + RADIUS || ball.getY() <= 0) {
 				dy = -dy;
 			}
+			if(p1Score == 5 || p2Score ==5) {
+				break;
+			}
+
 			ball.move(dx, dy);
 			increaseScore();
 			pause(5);
-			i++;
 		}
 	}
 
@@ -89,17 +104,24 @@ public class Pong extends GraphicsProgram {
 
 	public void increaseScore() {
 
-
-		if (getWidth() <= ball.getX() + RADIUS ) {
+		if (getWidth() <= ball.getX() + RADIUS) {
 			p1Score++;
-			player1.setLabel(p1Score+"");
+			player1.setLabel(p1Score + "");
 		}
-		if(ball.getX() <= 0) {
+		if (ball.getX() <= 0) {
 			p2Score++;
-			player2.setLabel(p2Score+"");
+			player2.setLabel(p2Score + "");
 		}
 	}
+
 	public void createPaddles() {
-		GRect paddle1 = new GRect(20, 50);
+		paddle1 = new GRect(10, 250);
+		paddle1.setFilled(true);
+		paddle1.setColor(Color.green);
+		paddle2 = new GRect(10, 250);
+		paddle2.setFilled(true);
+		paddle2.setColor(Color.green);
+		add(paddle1, 50, getHeight() / 2 - paddle1.getHeight() / 2);
+		add(paddle2, getWidth() - 50, getHeight() / 2 - paddle2.getHeight() / 2);
 	}
 }
