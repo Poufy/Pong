@@ -1,17 +1,19 @@
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics;
-
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.io.File;
 import acm.graphics.*;
 import acm.program.*;
 import java.util.Random;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.SourceDataLine;
+import java.awt.event.KeyAdapter;
 
-import javax.swing.JFrame;
-import javax.swing.UIManager;
-
-import java.lang.Object;
-
-public class Pong extends GraphicsProgram {
+public class Pong extends GraphicsProgram implements KeyListener {
 	private static final int RADIUS = 35;
 	private static final int BACKGROUND_WIDTH = 1200;
 	private static final int BACKGROUND_HEIGHT = 600;
@@ -21,22 +23,39 @@ public class Pong extends GraphicsProgram {
 	GLabel player2;
 	GLabel specialAbility1;
 	GLabel specialAbility2;
+	GLabel playAgain;
 	GRect paddle1;
 	GRect paddle2;
 	GPoint point1;
 	GPoint point2;
 	GPoint point3;
 	GPoint point4;
+	GLabel p1Win;
+	GLabel p2Win;
 	int p1Score = 0;
 	int p2Score = 0;
-
+	int i = 0;
+	int dx;
+	int dy;
+	private final int BUFFER_SIZE = 128000;
+	private File soundFile;
+	private AudioInputStream audioStream;
+	private AudioFormat audioFormat;
+	private SourceDataLine sourceLine;
+/*Things that need to be added:
+ * accelaration and decelration for more fluid movement
+ * Ultimate ability
+ * limiting the paddles from going off screen
+ * slow the ball a bit */
 	public void run() {
+		addKeyListeners();
 		createBackGround();
 		addScores();
 		specialAbilityFlashing();
 		createBall();
 		createPaddles();
 		moveBall();
+
 	}
 
 	public void createBackGround() {
@@ -47,6 +66,19 @@ public class Pong extends GraphicsProgram {
 //		frame.setVisible(true);
 		setBackground(Color.decode("#4E4B4B"));
 
+	}
+
+	public void playSound() {
+		File goal = new File("goal.wav");
+		try {
+			Clip clip = AudioSystem.getClip();
+			clip.open(AudioSystem.getAudioInputStream(goal));
+			clip.start();
+			Thread.sleep(clip.getMicrosecondLength() / 1000);
+
+		} catch (Exception e) {
+
+		}
 	}
 
 	public void createBall() {
@@ -60,12 +92,11 @@ public class Pong extends GraphicsProgram {
 		pause(1500); // wait for the text to be displayed
 		Random rand = new Random();
 		boolean x = rand.nextBoolean();
-		int dx = rand.nextInt(1) + 3;
+		dx = rand.nextInt(1) + 3;
 		if (x)
 			dx = -dx;
-		int dy = rand.nextInt(3) + 5;
-		int i = 0;
-		while (true) {
+		dy = rand.nextInt(3) + 5;
+		while (true) { // we could limit the loop with the goals instead but this works.
 			point1 = new GPoint(ball.getX(), ball.getY());
 			point2 = new GPoint(ball.getX() + RADIUS, ball.getY());
 			point3 = new GPoint(ball.getX() - RADIUS / 2, ball.getY());
@@ -94,24 +125,35 @@ public class Pong extends GraphicsProgram {
 				dy = -dy;
 			}
 
-			if (p1Score == 2 || p2Score == 2) {
+			if (p1Score == 5 || p2Score == 5) {
 				remove(ball);
 				if (p1Score > p2Score) {
-					GLabel p1Win = new GLabel("Left side won!!!");
+					p1Win = new GLabel("Left side won!!!");
+					playAgain = new GLabel("Press enter to play again");
 					p1Win.setColor(Color.GREEN);
 					p1Win.setFont(new Font("TimesRoman", Font.PLAIN, 40));
+					playAgain.setColor(Color.GREEN);
+					playAgain.setFont(new Font("TimesRoman", Font.PLAIN, 20));
 					add(p1Win, getWidth() / 2 - p1Win.getWidth() / 2, getHeight() / 2);
+					add(playAgain, getWidth() / 2 - playAgain.getWidth() / 2,
+							getHeight() / 2 - p1Win.getHeight() * 3 / 2);
+					break;
 				} else {
-					GLabel p2Win = new GLabel("Right side won!!!");
+					p2Win = new GLabel("Right side won!!!");
+					playAgain = new GLabel("Press enter to play again");
 					p2Win.setColor(Color.GREEN);
 					p2Win.setFont(new Font("TimesRoman", Font.PLAIN, 40));
+					playAgain.setColor(Color.GREEN);
+					playAgain.setFont(new Font("TimesRoman", Font.PLAIN, 20));
 					add(p2Win, getWidth() / 2 - p2Win.getWidth() / 2, getHeight() / 2);
+					add(playAgain, getWidth() / 2 - playAgain.getWidth() / 2,
+							getHeight() / 2 - p2Win.getHeight() * 3 / 2);
+					break;
 				}
-
-				break;
 
 			}
 			if (getWidth() <= ball.getX() + RADIUS || ball.getX() <= 0) {
+				// playSound();
 				newRound();
 				x = rand.nextBoolean();
 				dx = rand.nextInt(1) + 3;
@@ -136,6 +178,7 @@ public class Pong extends GraphicsProgram {
 		specialAbility2.setFont(new Font("TimesRoman", Font.PLAIN, 15));
 		add(specialAbility1, getWidth() / 4 - specialAbility1.getWidth() / 2, 60);
 		add(specialAbility2, getWidth() * 0.73 - specialAbility2.getWidth() / 2, 60);
+
 	}
 
 	public void addScores() {
@@ -174,8 +217,35 @@ public class Pong extends GraphicsProgram {
 	}
 
 	public void newRound() {
+
 		// also reset the paddles location later
 		ball.setLocation(getWidth() / 2 - RADIUS / 2, getHeight() / 2 - RADIUS / 2);
 		pause(1000);
 	}
+
+//	@Override
+//	public void keyReleased(KeyEvent e) {
+//		if (e.getKeyCode() == KeyEvent.VK_W) {
+//			paddle1.setLocation(paddle1.getX(),paddle1.getY() + 5);
+////			paddle1.move(0, 50);
+//		} else if (e.getKeyCode() == KeyEvent.VK_S) {
+////			paddle1.move(0, -50);
+//			paddle1.setLocation(paddle1.getX(),paddle1.getY() - 5);
+//		}
+//	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		if (e.getKeyCode() == KeyEvent.VK_W) {
+			paddle1.move(0, -10);
+		} else if (e.getKeyCode() == KeyEvent.VK_S) {
+			paddle1.move(0, 10);
+		} else if (e.getKeyCode() == KeyEvent.VK_UP) {
+			paddle2.move(0, -10);
+		} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+			paddle2.move(0, 10);
+		}
+	}
+
+
 }
