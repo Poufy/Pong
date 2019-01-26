@@ -5,8 +5,15 @@ import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+
 import acm.graphics.*;
 import acm.program.*;
+import sun.audio.AudioPlayer;
+import sun.audio.AudioStream;
+
+import java.util.ArrayList;
 import java.util.Random;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -14,14 +21,15 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.SourceDataLine;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
 import java.awt.event.KeyAdapter;
 
 public class Pong extends GraphicsProgram implements KeyListener {
 	private static final int RADIUS = 20;
-	private static final int BACKGROUND_WIDTH = 1500;
-	private static final int BACKGROUND_HEIGHT = 700;
+	private static final int BACKGROUND_WIDTH = 800;
+	private static final int BACKGROUND_HEIGHT = 450;
 	private static final int PAUSE_TIME = 40;
 	GOval ball;
 	GLabel player1;
@@ -39,15 +47,22 @@ public class Pong extends GraphicsProgram implements KeyListener {
 	GLabel p2Win;
 	boolean gameIsGoing = true;
 	boolean x;
+	boolean ultimateAvailable1 = true;
+	boolean ultimateAvailable2 = true;
+	boolean player1Won;
+	boolean player2Won;
 	Random rand;
-	float movement = 0;
+	float movement1 = 0;
+	float movement2 = 0;
 	int p1Score = 0;
 	int p2Score = 0;
 	int paddleHeight = 100;
+	int paddleUltimateHeight1 = 160;
+	int paddleUltimateHeight2 = 160;
 	float i = 0;
 	float dx;
 	float dy;
-
+	String goal = "goal.wav";
 
 	/*
 	 * Things that need to be added: accelaration and decelration for more fluid
@@ -73,7 +88,7 @@ public class Pong extends GraphicsProgram implements KeyListener {
 
 	public void createBackGround() {
 		setSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
-		setBackground(Color.decode("#4E4B4B"));
+		setBackground(Color.BLACK);
 
 	}
 
@@ -91,10 +106,12 @@ public class Pong extends GraphicsProgram implements KeyListener {
 	}
 
 	public void specialAbilityFlickering() {
+
 		if (i < 100) {
 			specialAbility1.setVisible(false);
 			specialAbility2.setVisible(false);
 		}
+
 		if (i > 100) {
 			specialAbility1.setVisible(true);
 			specialAbility2.setVisible(true);
@@ -103,6 +120,10 @@ public class Pong extends GraphicsProgram implements KeyListener {
 			}
 		}
 		i++;
+		if (!ultimateAvailable1)
+			remove(specialAbility1);
+		if (!ultimateAvailable2)
+			remove(specialAbility2);
 	}
 
 	public void createBall() {
@@ -115,8 +136,7 @@ public class Pong extends GraphicsProgram implements KeyListener {
 	public void createGPoints() {
 		point1 = new GPoint(ball.getX(), ball.getY());
 		point2 = new GPoint(ball.getX() + RADIUS, ball.getY());
-//		point3 = new GPoint(ball.getX() - RADIUS / 2, ball.getY());
-//		point4 = new GPoint(ball.getX() + RADIUS / 2, ball.getY());
+
 	}
 
 	public void randomInitialBallDirection() {
@@ -130,10 +150,22 @@ public class Pong extends GraphicsProgram implements KeyListener {
 
 	public void ballDeflect() {
 		if (paddle1.contains(point1) || paddle2.contains(point2)) {
-			dx = -dx;
+			if (dx > 0) {
+				dx = -dx - 1;
+			} else {
+				dx = -dx + 1;
+			}
+			if (dx > 10)
+				dx = 10;
+			playMusic("C:\\Users\\MCE\\git\\Pong\\Pong\\paddle_hit.wav");
 		}
+
 		if (getHeight() <= ball.getY() + RADIUS || ball.getY() <= 0) {
 			dy = -dy;
+
+			playMusic("C:\\Users\\MCE\\git\\Pong\\Pong\\wall_hit.wav");
+//			System.out.println(goal.getCanonicalPath());
+
 		}
 	}
 
@@ -141,7 +173,7 @@ public class Pong extends GraphicsProgram implements KeyListener {
 		switch (whoWon) {
 		case 1:
 			p1Win = new GLabel("Left side won!!!");
-			playAgain = new GLabel("Press enter to play again");
+			playAgain = new GLabel("");
 			p1Win.setColor(Color.GREEN);
 			p1Win.setFont(new Font("TimesRoman", Font.PLAIN, 40));
 			playAgain.setColor(Color.GREEN);
@@ -151,7 +183,7 @@ public class Pong extends GraphicsProgram implements KeyListener {
 			break;
 		case 2:
 			p2Win = new GLabel("Right side won!!!");
-			playAgain = new GLabel("Press enter to play again");
+			playAgain = new GLabel("");
 			p2Win.setColor(Color.GREEN);
 			p2Win.setFont(new Font("TimesRoman", Font.PLAIN, 40));
 			playAgain.setColor(Color.GREEN);
@@ -188,31 +220,44 @@ public class Pong extends GraphicsProgram implements KeyListener {
 				remove(ball);
 				if (p1Score > p2Score) {
 					winningLabel(1);
+					player1Won = true; // this boolean is for reseting game so we know which GLabel to remove
 					break;
 				} else {
 					winningLabel(2);
+					player2Won = true;
 					break;
 				}
 
 			}
 			if (getWidth() <= ball.getX() + RADIUS || ball.getX() <= 0) {
 				// playSound();
+				playMusic("C:\\\\Users\\\\MCE\\\\git\\\\Pong\\\\Pong\\\\goal.wav");
 				goalScored();
+
 			}
 
 			ball.move(dx, dy);
+			if (movement1 > 6)
+				movement1 = 6;
+			if (movement2 > 6)
+				movement2 = 6;
+			if (movement1 < -6)
+				movement1 = -6;
+			if (movement2 < -6)
+				movement2 = -6;
+			paddle1.move(0, movement1);
+			paddle2.move(0, movement2);
 			increaseScore();
-			double z = 9;
-			if(z > 6) z-= 0.001;
-			pause(z);
+			pause(8);
 		}
 		gameIsGoing = false;
+		playMusic("C:\\Users\\MCE\\git\\Pong\\Pong\\Kids Cheering-SoundBible.com-681813822.wav");
 		resetPaddlesLocation();
 	}
 
 	public void specialAbilityFlashing() {
 		specialAbility1 = new GLabel("Ultimate: Press D");
-		specialAbility2 = new GLabel("Ultimate: Press 0");
+		specialAbility2 = new GLabel("Ultimate: Press RIGHT");
 		specialAbility1.setColor(Color.green);
 		specialAbility2.setColor(Color.green);
 		specialAbility1.setFont(new Font("TimesRoman", Font.PLAIN, 15));
@@ -248,22 +293,56 @@ public class Pong extends GraphicsProgram implements KeyListener {
 	}
 
 	public void createPaddles() {
-		paddle1 = new GRect(10, paddleHeight);
+		paddle1 = new GRect(5, paddleHeight);
 		paddle1.setFilled(true);
 		paddle1.setColor(Color.green);
-		paddle2 = new GRect(10, paddleHeight);
+		paddle2 = new GRect(5, paddleHeight);
 		paddle2.setFilled(true);
 		paddle2.setColor(Color.green);
 		add(paddle1, 50, getHeight() / 2 - paddleHeight / 2);
 		add(paddle2, getWidth() - 50, getHeight() / 2 - paddleHeight / 2);
 	}
 
+	public void playMusic(String filePath) {
+//		InputStream music;
+//		try {
+//			music  = new FileInputStream(new File(filePath));
+//			AudioStream audios = new AudioStream(music);
+//			AudioPlayer.player.start(audios);
+//		} catch (Exception e) {
+//			print("error " + e);
+//		}
+		try {
+			Clip clip = AudioSystem.getClip();
+			clip.open(AudioSystem.getAudioInputStream(new File(filePath)));
+			clip.start();
+		} catch (Exception exc) {
+			exc.printStackTrace(System.out);
+		}
+	}
+
 	public void newRound() {
 
 		// also reset the paddles location later
 		ball.setLocation(getWidth() / 2 - RADIUS / 2, getHeight() / 2 - RADIUS / 2);
+		remove(paddle1);
+		remove(paddle2);
+		createPaddles();
 		pause(1000);
 	}
+
+//	public void resetAll() {
+//		
+//		ultimateAvailable1 = true;
+//		ultimateAvailable2 = true;
+//		p1Score = 0;
+//		p2Score = 0;
+//		removeAll();
+//	}
+
+//	public void startAgain() {
+//		run();
+//	}
 
 	public void resetPaddlesLocation() {
 		paddle1.setLocation(50, getHeight() / 2 - paddle1.getHeight() / 2);
@@ -290,34 +369,67 @@ public class Pong extends GraphicsProgram implements KeyListener {
 //		if(movement >= 6) movement = 6;
 		if (gameIsGoing) {
 			if (e.getKeyCode() == KeyEvent.VK_W) {
-				movement = 8;
-				paddle1.move(0, -movement);
+				movement1 = -10;
+//				paddle1.move(0, -movement);
 			} else if (e.getKeyCode() == KeyEvent.VK_S) {
-				movement = 8;
-				paddle1.move(0, movement);
+				movement1 = 10;
+//				paddle1.move(0, movement);
 			} else if (e.getKeyCode() == KeyEvent.VK_UP) {
-				movement = 8;
-				paddle2.move(0, -movement);
+				movement2 = -10;
+//				paddle2.move(0, -movement);
 			} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-				movement = 8;
-				paddle2.move(0, movement);
+				movement2 = 10;
+//				paddle2.move(0, movement);
 			}
+
+			if (e.getKeyCode() == KeyEvent.VK_D) {
+				if (ultimateAvailable1) {
+					remove(paddle1);
+					paddle1 = new GRect(10, paddleUltimateHeight1);
+					paddle1.setColor(Color.red);
+					paddle1.setFilled(true);
+					playMusic("C:\\Users\\MCE\\git\\Pong\\Pong\\Power_Up_Ray-Mike_Koenig-800933783.wav");
+					add(paddle1, 50, getHeight() / 2 - paddleHeight / 2);
+				}
+				ultimateAvailable1 = false;
+			}
+			if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+				if (ultimateAvailable2) {
+					remove(paddle2);
+					paddle2 = new GRect(10, paddleUltimateHeight2);
+					paddle2.setColor(Color.red);
+					paddle2.setFilled(true);
+					playMusic("C:\\Users\\MCE\\git\\Pong\\Pong\\Power_Up_Ray-Mike_Koenig-800933783.wav");
+					add(paddle2, getWidth() - 50, getHeight() / 2 - paddleHeight / 2);
+				}
+				ultimateAvailable2 = false;
+			}
+		}
+		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+			System.exit(0);
+		}
+		if (gameIsGoing == false && e.getKeyCode() == KeyEvent.VK_ENTER) {
+//			resetAll();
+//			startAgain();
 		}
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		
+
 		if (gameIsGoing) {
 			if (e.getKeyCode() == KeyEvent.VK_W) {
-				movement *= 0.95;
-				paddle1.move(0, -movement);
+				movement1 = 0;
+//				paddle1.move(0, -movement);
 			} else if (e.getKeyCode() == KeyEvent.VK_S) {
-				movement *= 0.95;				paddle1.move(0, movement);
+				movement1 = 0;
+//				paddle1.move(0, movement);
 			} else if (e.getKeyCode() == KeyEvent.VK_UP) {
-				movement *= 0.95;				paddle2.move(0, -movement);
+				movement2 = 0;
+//				paddle2.move(0, -movement);
 			} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-				movement *= 0.95;				paddle2.move(0, movement);
+				movement2 = 0;
+//				paddle2.move(0, movement);
 			}
 		}
 	}
