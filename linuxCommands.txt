@@ -1,3 +1,0 @@
-ps aux | grep <process name> to narrow down results
-pkill <process name> or kill <process ID>
-rm -rf <directory name> to delete all of it
