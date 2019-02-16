@@ -28,9 +28,8 @@ import java.awt.event.KeyAdapter;
 
 public class Pong extends GraphicsProgram implements KeyListener {
 	private static final int RADIUS = 20;
-	private static final int BACKGROUND_WIDTH = 800;
-	private static final int BACKGROUND_HEIGHT = 450;
-	private static final int PAUSE_TIME = 40;
+	private static final int BACKGROUND_WIDTH = 1200;
+	private static final int BACKGROUND_HEIGHT = 600;
 	GOval ball;
 	GLabel player1;
 	GLabel player2;
@@ -45,6 +44,7 @@ public class Pong extends GraphicsProgram implements KeyListener {
 	GPoint point4;
 	GLabel p1Win;
 	GLabel p2Win;
+	String wavDirectory;
 	boolean gameIsGoing = true;
 	boolean x;
 	boolean ultimateAvailable1 = true;
@@ -62,6 +62,7 @@ public class Pong extends GraphicsProgram implements KeyListener {
 	float i = 0;
 	float dx;
 	float dy;
+	
 	String goal = "goal.wav";
 
 	/*
@@ -157,13 +158,16 @@ public class Pong extends GraphicsProgram implements KeyListener {
 			}
 			if (dx > 10)
 				dx = 10;
-			playMusic("C:\\Users\\MCE\\git\\Pong\\Pong\\paddle_hit.wav");
+			wavDirectory= System.getProperty("user.dir");
+			wavDirectory = wavDirectory.substring(0, wavDirectory.length()-3) + "paddle_hit.wav";
+			playMusic(wavDirectory);
 		}
 
 		if (getHeight() <= ball.getY() + RADIUS || ball.getY() <= 0) {
 			dy = -dy;
-
-			playMusic("C:\\Users\\MCE\\git\\Pong\\Pong\\wall_hit.wav");
+			wavDirectory= System.getProperty("user.dir");
+			wavDirectory = wavDirectory.substring(0, wavDirectory.length()-3) + "wall_hit.wav";
+			playMusic(wavDirectory);
 //			System.out.println(goal.getCanonicalPath());
 
 		}
@@ -231,7 +235,9 @@ public class Pong extends GraphicsProgram implements KeyListener {
 			}
 			if (getWidth() <= ball.getX() + RADIUS || ball.getX() <= 0) {
 				// playSound();
-				playMusic("C:\\\\Users\\\\MCE\\\\git\\\\Pong\\\\Pong\\\\goal.wav");
+				wavDirectory = System.getProperty("user.dir");
+				wavDirectory = wavDirectory.substring(0, wavDirectory.length()-3) + "goal.wav";
+				playMusic(wavDirectory);
 				goalScored();
 
 			}
@@ -251,7 +257,9 @@ public class Pong extends GraphicsProgram implements KeyListener {
 			pause(8);
 		}
 		gameIsGoing = false;
-		playMusic("C:\\Users\\MCE\\git\\Pong\\Pong\\Kids Cheering-SoundBible.com-681813822.wav");
+		wavDirectory= System.getProperty("user.dir");
+		wavDirectory = wavDirectory.substring(0, wavDirectory.length()-3) + "Kids Cheering-SoundBible.com-681813822.wav";
+		playMusic(wavDirectory);
 		resetPaddlesLocation();
 	}
 
@@ -304,17 +312,11 @@ public class Pong extends GraphicsProgram implements KeyListener {
 	}
 
 	public void playMusic(String filePath) {
-//		InputStream music;
-//		try {
-//			music  = new FileInputStream(new File(filePath));
-//			AudioStream audios = new AudioStream(music);
-//			AudioPlayer.player.start(audios);
-//		} catch (Exception e) {
-//			print("error " + e);
-//		}
 		try {
 			Clip clip = AudioSystem.getClip();
-			clip.open(AudioSystem.getAudioInputStream(new File(filePath)));
+			File file = new File(filePath);
+			
+			clip.open(AudioSystem.getAudioInputStream(file));
 			clip.start();
 		} catch (Exception exc) {
 			exc.printStackTrace(System.out);
@@ -330,19 +332,6 @@ public class Pong extends GraphicsProgram implements KeyListener {
 		createPaddles();
 		pause(1000);
 	}
-
-//	public void resetAll() {
-//		
-//		ultimateAvailable1 = true;
-//		ultimateAvailable2 = true;
-//		p1Score = 0;
-//		p2Score = 0;
-//		removeAll();
-//	}
-
-//	public void startAgain() {
-//		run();
-//	}
 
 	public void resetPaddlesLocation() {
 		paddle1.setLocation(50, getHeight() / 2 - paddle1.getHeight() / 2);
@@ -366,20 +355,17 @@ public class Pong extends GraphicsProgram implements KeyListener {
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-//		if(movement >= 6) movement = 6;
 		if (gameIsGoing) {
 			if (e.getKeyCode() == KeyEvent.VK_W) {
 				movement1 = -10;
-//				paddle1.move(0, -movement);
 			} else if (e.getKeyCode() == KeyEvent.VK_S) {
 				movement1 = 10;
-//				paddle1.move(0, movement);
+
 			} else if (e.getKeyCode() == KeyEvent.VK_UP) {
 				movement2 = -10;
-//				paddle2.move(0, -movement);
 			} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 				movement2 = 10;
-//				paddle2.move(0, movement);
+
 			}
 
 			if (e.getKeyCode() == KeyEvent.VK_D) {
@@ -388,6 +374,7 @@ public class Pong extends GraphicsProgram implements KeyListener {
 					paddle1 = new GRect(10, paddleUltimateHeight1);
 					paddle1.setColor(Color.red);
 					paddle1.setFilled(true);
+					
 					playMusic("C:\\Users\\MCE\\git\\Pong\\Pong\\Power_Up_Ray-Mike_Koenig-800933783.wav");
 					add(paddle1, 50, getHeight() / 2 - paddleHeight / 2);
 				}
@@ -399,7 +386,9 @@ public class Pong extends GraphicsProgram implements KeyListener {
 					paddle2 = new GRect(10, paddleUltimateHeight2);
 					paddle2.setColor(Color.red);
 					paddle2.setFilled(true);
-					playMusic("C:\\Users\\MCE\\git\\Pong\\Pong\\Power_Up_Ray-Mike_Koenig-800933783.wav");
+					wavDirectory= System.getProperty("user.dir");
+					wavDirectory = wavDirectory.substring(0, wavDirectory.length()-3) + "Power_Up_Ray-Mike_Koenig-800933783.wav";
+					playMusic(wavDirectory);
 					add(paddle2, getWidth() - 50, getHeight() / 2 - paddleHeight / 2);
 				}
 				ultimateAvailable2 = false;
