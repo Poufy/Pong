@@ -15,39 +15,14 @@ public class Pong extends GraphicsProgram implements KeyListener {
 	private static final int BACKGROUND_WIDTH = 1200;
 	private static final int BACKGROUND_HEIGHT = 600;
 	GOval ball;
-	GLabel player1;
-	GLabel player2;
-	GLabel specialAbility1;
-	GLabel specialAbility2;
-	GLabel playAgain;
-	GRect paddle1;
-	GRect paddle2;
-	GPoint point1;
-	GPoint point2;
-	GPoint point3;
-	GPoint point4;
-	GLabel p1Win;
-	GLabel p2Win;
+	GLabel player1, player2, specialAbility1, specialAbility2, playAgain, p1Win, p2Win;
+	GRect paddle1, paddle2;
+	GPoint point1, point2, point3, point4;
 	String wavDirectory;
-	boolean gameIsGoing = true;
-	boolean x;
-	boolean ultimateAvailable1 = true;
-	boolean ultimateAvailable2 = true;
-	boolean player1Won;
-	boolean player2Won;
+	boolean gameIsGoing = true, ultimateAvailable1 = true, ultimateAvailable2 = true, x, player1Won, player2Won, leftSide;
 	Random rand;
-	float movement1 = 0;
-	float movement2 = 0;
-	int p1Score = 0;
-	int p2Score = 0;
-	int paddleHeight = 100;
-	int paddleUltimateHeight1 = 160;
-	int paddleUltimateHeight2 = 160;
-	float i = 0;
-	float dx;
-	float dy;
-	boolean leftSide;
-
+	float movement1 = 0, movement2 = 0, i = 0, dx, dy;
+	int p1Score = 0, p2Score = 0, paddleHeight = 100, paddleUltimateHeight1 = 160, paddleUltimateHeight2 = 160;
 	String goal = "goal.wav";
 
 	public void run() {
@@ -67,20 +42,18 @@ public class Pong extends GraphicsProgram implements KeyListener {
 		GRect line = new GRect(6, BACKGROUND_HEIGHT);
 		line.setFilled(true);
 		line.setColor(Color.decode("#B6D0CB"));
-		GOval outerMidCircle = new GOval(90,90);
-		GOval innerMidCircle = new GOval(66,66);
+		GOval outerMidCircle = new GOval(90, 90);
+		GOval innerMidCircle = new GOval(66, 66);
 		outerMidCircle.setFilled(true);
 		innerMidCircle.setFilled(true);
 		outerMidCircle.setFillColor(Color.decode("#B6D0CB"));
 		outerMidCircle.setColor(Color.decode("#B6D0CB"));
 		innerMidCircle.setFillColor(Color.decode("#015F45"));
 		innerMidCircle.setFillColor(Color.decode("#015F45"));
-		
-		add(line, BACKGROUND_WIDTH / 2 - 3, 0);		
-		add(outerMidCircle, BACKGROUND_WIDTH / 2 - 45, BACKGROUND_HEIGHT/2 - 45);
-		add(innerMidCircle, BACKGROUND_WIDTH / 2 - 33, BACKGROUND_HEIGHT/2 - 33);
 
-		
+		add(line, BACKGROUND_WIDTH / 2 - 3, 0);
+		add(outerMidCircle, BACKGROUND_WIDTH / 2 - 45, BACKGROUND_HEIGHT / 2 - 45);
+		add(innerMidCircle, BACKGROUND_WIDTH / 2 - 33, BACKGROUND_HEIGHT / 2 - 33);
 
 	}
 
@@ -172,7 +145,7 @@ public class Pong extends GraphicsProgram implements KeyListener {
 			p1Win.setFont(new Font("SansSerif", Font.BOLD, 40));
 			playAgain.setColor(Color.decode("#1E62D0"));
 			playAgain.setFont(new Font("SansSerif", Font.BOLD, 20));
-			add(p1Win, getWidth() / 2 - p1Win.getWidth() / 2, getHeight() / 2+ 20);
+			add(p1Win, getWidth() / 2 - p1Win.getWidth() / 2, getHeight() / 2 + 20);
 			add(playAgain, getWidth() / 2 - playAgain.getWidth() / 2, getHeight() / 2 - p1Win.getHeight() * 3 / 2);
 			break;
 		case 2:
@@ -185,7 +158,7 @@ public class Pong extends GraphicsProgram implements KeyListener {
 			add(p2Win, getWidth() / 2 - p2Win.getWidth() / 2, getHeight() / 2 + 20);
 			add(playAgain, getWidth() / 2 - playAgain.getWidth() / 2, getHeight() / 2 - p2Win.getHeight() * 3 / 2);
 			break;
-		
+
 		}
 
 	}
@@ -211,24 +184,24 @@ public class Pong extends GraphicsProgram implements KeyListener {
 			specialAbilityFlickering();
 			ballDeflect();
 			ballSwitchingColor(leftSide);
-			if (ball.getX() < BACKGROUND_WIDTH / 2 + ball.getWidth()/2) {
+			if (ball.getX() < BACKGROUND_WIDTH / 2 + ball.getWidth() / 2) {
 				leftSide = true;
-			}else {
+			} else {
 				leftSide = false;
 			}
-				if (p1Score == 5 || p2Score == 5) {
-					remove(ball);
-					if (p1Score > p2Score) {
-						winningLabel(1);
-						player1Won = true; // this boolean is for reseting game so we know which GLabel to remove
-						break;
-					} else {
-						winningLabel(2);
-						player2Won = true;
-						break;
-					}
-
+			if (p1Score == 5 || p2Score == 5) {
+				remove(ball);
+				if (p1Score > p2Score) {
+					winningLabel(1);
+					player1Won = true; // this boolean is for reseting game so we know which GLabel to remove
+					break;
+				} else {
+					winningLabel(2);
+					player2Won = true;
+					break;
 				}
+
+			}
 			if (getWidth() <= ball.getX() + RADIUS || ball.getX() <= 0) {
 				// playSound();
 				wavDirectory = System.getProperty("user.dir");
