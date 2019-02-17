@@ -185,6 +185,7 @@ public class Pong extends GraphicsProgram implements KeyListener {
 			add(p2Win, getWidth() / 2 - p2Win.getWidth() / 2, getHeight() / 2 + 20);
 			add(playAgain, getWidth() / 2 - playAgain.getWidth() / 2, getHeight() / 2 - p2Win.getHeight() * 3 / 2);
 			break;
+		
 		}
 
 	}
