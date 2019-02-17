@@ -172,7 +172,7 @@ public class Pong extends GraphicsProgram implements KeyListener {
 			p1Win.setFont(new Font("SansSerif", Font.BOLD, 40));
 			playAgain.setColor(Color.decode("#1E62D0"));
 			playAgain.setFont(new Font("SansSerif", Font.BOLD, 20));
-			add(p1Win, getWidth() / 2 - p1Win.getWidth() / 2, getHeight() / 2);
+			add(p1Win, getWidth() / 2 - p1Win.getWidth() / 2, getHeight() / 2+ 20);
 			add(playAgain, getWidth() / 2 - playAgain.getWidth() / 2, getHeight() / 2 - p1Win.getHeight() * 3 / 2);
 			break;
 		case 2:
@@ -182,7 +182,7 @@ public class Pong extends GraphicsProgram implements KeyListener {
 			p2Win.setFont(new Font("SansSerif", Font.BOLD, 40));
 			playAgain.setColor(Color.decode("#1E62D0"));
 			playAgain.setFont(new Font("TimesRoman", Font.PLAIN, 20));
-			add(p2Win, getWidth() / 2 - p2Win.getWidth() / 2, getHeight() / 2);
+			add(p2Win, getWidth() / 2 - p2Win.getWidth() / 2, getHeight() / 2 + 20);
 			add(playAgain, getWidth() / 2 - playAgain.getWidth() / 2, getHeight() / 2 - p2Win.getHeight() * 3 / 2);
 			break;
 		}
